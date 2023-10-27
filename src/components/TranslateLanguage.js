@@ -4,6 +4,7 @@ import { ApiEndPoint } from './service/ApiEndPoint'
 import API from './service/ApiService'
 import LoadingSpinner from './LoadingSpinner';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useApiKey } from './context';
 
 function TranslateLanguage() {
     const getSecretValue = localStorage.getItem('secretKey')
@@ -12,6 +13,9 @@ function TranslateLanguage() {
     const [results, setResults] = useState("")
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
+    const[error,setError] = useState('');
+
+    const api_key = useApiKey();
 
 
     useEffect(() => {
@@ -28,7 +32,7 @@ function TranslateLanguage() {
             "accept": "application/json",
             "Content-Type": "multipart/form-data",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
         setLoading(true)
@@ -43,17 +47,18 @@ function TranslateLanguage() {
             setLanguage("Select language")
             setLoading(false)
 
-        })
-            .catch((error) => {
+        }).catch((error) => {
                 console.log('error', error);
-                setLoading(false)
+                setLoading(false);
+                
+                setError(error.response.data.message)
             });
 
     }
 
     return (
         <div>
-            {/* <LoadingSpinner/> */}
+      
             <SideBar />
             <div class="content">
                 {console.log(loading)}
@@ -76,7 +81,7 @@ function TranslateLanguage() {
                         {loading ? <LoadingSpinner /> : null}
                     </div>
                 }
-
+       <p style={{"color":"red"}}>{error}</p>
                 <form onSubmit={(event) => event.preventDefault()}>
                     <div className='input-container'>
                         <input value={query} onChange={(e) => { console.log("hh", e.target.value); setQuery(e.target.value) }} placeholder='Text to translate' className='inputmessage' required /><i class="fa fa-paper-plane" aria-hidden="true"></i>

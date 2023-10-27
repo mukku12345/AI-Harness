@@ -1,16 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter,Route, Routes, Link, HashRouter as Router  } from "react-router-dom"
+import {  HashRouter as Router  } from "react-router-dom";
+import { ApiKeyProvider } from "./components/context";
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+ 
+
     <Router>
     <App />
     </Router>
+   
+
   </React.StrictMode>
 );
 

@@ -1,6 +1,7 @@
 import React from 'react'
 import logo from '../assets/ge-logo.png'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
+import Footer from '../Footer';
 
 
 function Activate() {
@@ -11,20 +12,22 @@ function Activate() {
         navigate('/accountDetails')
     }
   return (
-    <section class="main-container activated-container">
-      <div class="logo">
+    <section className="main-container activated-container">
+      <div className='container'>
+      <div className="logo">
           <img src={logo} alt="AI Harness"/>
       </div>
-      <div class="content-text">
+      <div className="content-text">
          <h2>Almost Done!!</h2>
           <p>Click the button below to activate your new AI account.</p>
       </div>
-      <div class="login-form">
-        <form onSubmit={(e)=>{e.preventDefault()}}>
-          <button onClick={()=>{gotToAccountDetails()}}>ACTIVATE</button>
-        </form>
+      <div className="login-form">
+        
+          <button className='active-btn' onClick={()=>{gotToAccountDetails()}}>ACTIVATE</button>
+      
       </div>
-      <footer>A Product by <a href="#" target="_blank"> Vibhuti Technologies </a> </footer>
+      </div>
+      <Footer/>
   </section>
   )
 }

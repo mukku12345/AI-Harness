@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 function Connect() {
     const navigate=useNavigate();
@@ -15,4 +15,4 @@ function Connect() {
   )
 }
 
-export default Connect
+export default Connect;

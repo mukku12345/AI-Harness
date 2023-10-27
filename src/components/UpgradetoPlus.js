@@ -6,6 +6,9 @@ import Modal from 'react-modal';
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css'
 import Test from './Testing';
+import { Link ,useNavigate} from 'react-router-dom';
+import Footer from '../Footer';
+import { useApiKey } from './context';
 
 
 Modal.setAppElement('#root');
@@ -17,23 +20,28 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    width: "350px",
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+    border: "none"
   },
 };
 
 
 
 function UpgradetoPlus() {
-  const getSecretValue = localStorage.getItem('secretKey')
-  const subscriptionStatus = localStorage.getItem("Subscription")
-  console.log("subscriptionStatus in UpgradePlus",JSON.parse(subscriptionStatus))
+  const getSecretValue = localStorage.getItem('secretKey');
+  const subscriptionStatus = localStorage.getItem("subscription");
+  const navigate = useNavigate()
 
-  console.log("secret key on Upgrade page",getSecretValue)
+  console.log("subscriptionStatus in UpgradePlus", JSON.parse(subscriptionStatus))
+
+  console.log("secret key on Upgrade page", getSecretValue)
   const email = localStorage.getItem('email')
 
   const [loading, setLoading] = useState(false);
   const [freePlan, setFreePlan] = useState([]);
   const [premium, setPremium] = useState([]);
-  const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [modalIsOpen, setIsOpen] = useState(JSON.parse(localStorage.getItem('modalIsOpen')) || false);
   const [cvc, setCvc] = useState('')
   const [expiry, setExpiry] = useState('')
   const [focus, setFocus] = useState('')
@@ -43,6 +51,8 @@ function UpgradetoPlus() {
   const [pi_id, setPi_id] = useState('');
 
 
+
+  const api_key = useApiKey()
 
 
 
@@ -61,16 +71,16 @@ function UpgradetoPlus() {
     const headers = {
       "accept": "application/json",
       "secertkey": getSecretValue,
-      "openai": ApiEndPoint.OpenAIKey
+      "openai": api_key
 
     }
     setLoading(true)
-    API.get(ApiEndPoint.GetPlan, "",{
+    API.get(ApiEndPoint.GetPlan, "", {
       headers: headers
     }).then((response) => {
 
-      console.log('result GetPlan', response.data.data);      
-      setPlanDetail(response.data.data);
+      console.log('result GetPlan', response.data.data[1]);
+      setPlanDetail([response.data.data[1]]);
 
     })
       .catch((error) => {
@@ -85,7 +95,7 @@ function UpgradetoPlus() {
     const headers = {
       "accept": "application/json",
       "secertkey": getSecretValue,
-      "openai": ApiEndPoint.OpenAIKey
+      "openai": api_key
 
     }
     setLoading(true)
@@ -93,7 +103,7 @@ function UpgradetoPlus() {
       headers: headers
     }).then((response) => {
 
-      console.log('result PlanPrices', response.data.data);
+      console.log('result PlanPrices', response.data);
     })
       .catch((error) => {
         console.log('error', error);
@@ -122,48 +132,49 @@ function UpgradetoPlus() {
     setNumber(e.target.value)
   }
 
-  const createPaymentIntent=()=>{
+  const createPaymentIntent = () => {
 
     var bodyFormData = new FormData();
-        bodyFormData.append("email", email);
-        const headers = {
-            "accept": "application/json",
-            "Content-Type": "multipart/form-data",
-            "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+    bodyFormData.append("email", email);
+    const headers = {
+      "accept": "application/json",
+      "Content-Type": "multipart/form-data",
+      "secertkey": getSecretValue,
+      "openai": api_key
 
-        }
+    }
 
-        API.post(ApiEndPoint.CreatePaymentIntent,{
-            headers: headers
-        }).then((response) => {
+    API.post(ApiEndPoint.CreatePaymentIntent, {
+      headers: headers
+    }).then((response) => {
 
-            console.log('result CreatePaymentIntent', response.data.data);
-            console.log("paymentIntent is", response.data.data.client_secret)
-            setPi_id(response.data.data.client_secret);
-            localStorage.setItem('paymentIntent',response.data.data.client_secret)
-            setIsOpen(true);
-            setLoading(false)
+      console.log('result CreatePaymentIntent', response.data.data);
+      console.log("paymentIntent is", response.data.data.client_secret)
+      setPi_id(response.data.data.client_secret);
+      localStorage.setItem('paymentIntent', response.data.data.client_secret)
+      setIsOpen(true);
+      setLoading(false);
+      localStorage.setItem('modalIsOpen',JSON.stringify(true));
 
-        })
-            .catch((error) => {
-                console.log('error', error);
-                setLoading(false)
+    })
+      .catch((error) => {
+        console.log('error', error);
+        setLoading(false)
 
-            });
+      });
 
   }
 
-  const createSubscription=()=>{
-    
-  }
+  const createSubscription = () => {
 
+  }
+  console.log("chekingmodel",typeof modalIsOpen ,modalIsOpen)
   return (
-    <div>
-      <SideBar />
+    <div className='upgrade-plan'>
+      {/* <SideBar /> */}
       <div class="content">
-        <h2>Responsive Column Cards</h2>
-        <p>Resize the browser window to see the effect.</p>
+        {/* <h2>Responsive Column Cards</h2>
+        <p>Resize the browser window to see the effect.</p> */}
 
         <div class="row">
           {planDetail.map((item) => {
@@ -171,30 +182,43 @@ function UpgradetoPlus() {
             return (
               <div class="column">
                 <div class="card">
-                  <h3 style={{ color: 'green' }}>{item.name}</h3>
-                {
-                
-                (item.id==1 && subscriptionStatus )?<button onClick={()=>{createPaymentIntent(item)}}>Your Current Plan</button>
-                
-                :
-                (item.id==1)?<button>Your Current Plan</button>:
-                <>
-                 {/* <button disabled>Purchased</button> */}
-                {JSON.parse(subscriptionStatus)?
-                
-                <button>Purchased</button>
-              :
-              <button onClick={()=>{createPaymentIntent(item)}}>Upgrade Plan</button>
-            }
-                </>
-                }  
+                  <span><i class="fa-solid fa-angle-left back-arrorw-prem" onClick={()=>{navigate(-1)}}></i> </span>
+           <h3> {item.name}</h3>
+           <h1> $10/MO</h1>
+
+                  {
+
+                    (item.id == 1 && subscriptionStatus) ? <button >Your current plan</button>
+
+                      :
+                      (item.id == 1) ? <button>Purchase</button> :
+                        <>
+                          {/* <button disabled>Purchased</button> */}
+                          {JSON.parse(subscriptionStatus) ?
+
+                            <button>Purchased</button>
+                            :
+                            <>
+                            <button onClick={() => { createPaymentIntent(item) }}>Upgrade Plan</button>
+                            </>
+                          }
+                        </>
+                  }
+
+<div className='upgrade-para'>
 
                   {(item.plan_feature_associates
                   ).map((item) => {
                     return (
-                      <p>{item.name}</p>
+                      <>
+                      { item.plan_id ==2 && <p>{item.name}</p>}
+                      
+                      </>
                     )
                   })}
+
+</div>
+
                 </div>
               </div>
 
@@ -204,20 +228,28 @@ function UpgradetoPlus() {
         </div>
         <div>
           {/* <button onClick={openModal}>Open Modal</button> */}
-          <Modal
-            isOpen={modalIsOpen}
+          { modalIsOpen ? <Modal
+            isOpen="true"
             onAfterOpen={afterOpenModal}
             onRequestClose={closeModal}
             style={customStyles}
             contentLabel="Example Modal"
           >
-            <button style={{marginTop:20}} onClick={closeModal}>close</button>
+            {/* {console.log("chekingmodel",typeof modalIsOpen ,modalIsOpen)} */}
             <div id="PaymentForm">
-              <Test/>
+              <Test  />
+            <button className='payment-cancel-btn'  onClick={closeModal}>cancel</button>
             </div>
           </Modal>
+          : null
+}
+         
+
+
+
         </div>
       </div>
+      {/* <Footer/> */}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import SideBar from './SideBar';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import LoadingSpinner from './LoadingSpinner';
+import { useApiKey } from './context';
 
 function EngTranscription(props) {
     const getSecretValue = localStorage.getItem('secretKey')
@@ -16,6 +17,7 @@ function EngTranscription(props) {
     const [navigation, setNavigation] = useState(false)
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
+    const api_key =  useApiKey()
 
     useEffect(() => {
         console.log("navigation value", navigation)
@@ -34,7 +36,7 @@ function EngTranscription(props) {
             "accept": "application/json",
             "Content-Type": "multipart/form-data",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
 

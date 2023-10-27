@@ -2,12 +2,18 @@ import React, { useEffect, useState } from 'react'
 import SideBar from './SideBar'
 import API from '../components/service/ApiService';
 import { ApiEndPoint } from '../components/service/ApiEndPoint';
+import { useApiKey } from './context';
+
 function AccountSetting() {
     const getSecretValue = localStorage.getItem('secretKey')
     const [currentSubscriptionData, setCurrentSubscriptionData] = useState([])
     const [currentStartDate, setCurrentStartDate] = useState("");
     const [currentEndDate, setCurrentEndDate] = useState("")
-    const [subscriptionList, setSubscriptionList] = useState([])
+    const [subscriptionList, setSubscriptionList] = useState([]);
+    const [billingAndAccount, setBillandAccount] = useState("1")
+
+    const api_key =useApiKey();
+
     useEffect(() => {
         getUserCurrentSubsriptionDetails();
         getListofSubscriptions()
@@ -17,7 +23,7 @@ function AccountSetting() {
         const headers = {
             "accept": "application/json",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
         API.get(ApiEndPoint.GetCurrentSubscription, {
@@ -47,7 +53,7 @@ function AccountSetting() {
         const headers = {
             "accept": "application/json",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
         API.get(ApiEndPoint.GetListofSubscription, {
@@ -68,7 +74,7 @@ function AccountSetting() {
         const headers = {
             "accept": "application/json",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
         API.delete(ApiEndPoint.Cancelsubscription, {
@@ -82,44 +88,49 @@ function AccountSetting() {
             });
     }
     return (
-        // <div>AccountSetting</div>
+
         <div>
-            <SideBar />
-            <div class="content">
-                AccountSetting
-                {/* <!-- Current Subscription -->? */}
+
+<div class="d-grid gap-4 d-md-block">
+  <button class="btn btn-primary" type="button" onClick={() => { setBillandAccount("1") }}>Billing and Subscription</button>
+  <button class="btn btn-primary" type="button" onClick={() => { setBillandAccount("2") }}>Account</button>
+</div>
+            {/* <div onClick={() => { setBillandAccount("1") }}>Billing and Subscription</div>
+            <div onClick={() => { setBillandAccount("2") }}>Account</div> */}
+
+            {billingAndAccount == 1 ? <div class="content">
+
                 <div class="main" id="Subscription">
-                    <h2>Current Active Subscription</h2>
+                    <h2>Active Subscription</h2>
                     <div class="card">
                         <div class="card-body">
-                            <i class="fa fa-pen fa-xs edit"></i>
-                            <table>
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Subscription ID</th>
+                                        <th scope="col">Start Data</th>
+                                        <th scope="col">End Data</th>
+                                    </tr>
+                                    </thead>
+
                                 <tbody>
-                                    <tr>
-                                        <td>Subscription ID:</td>
-                                        <td>:</td>
-                                        <td>{currentSubscriptionData.id}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Start Data</td>
-                                        <td>:</td>
+
+                                          <tr>
+                                        <td>{localStorage.getItem('email')}</td>
+                                        <td>{currentSubscriptionData.id}1</td>
                                         <td>
-                                            {currentStartDate}
+                                            {currentStartDate}2
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>End Data</td>
-                                        <td>:</td>
                                         <td>
-                                            {currentEndDate}
+                                            {currentEndDate}3
                                         </td>
+
                                     </tr>
-                                    <tr>
-                                        <td>Email: </td>
-                                        <td>:</td>
-                                        <td>naveen191@vibhuti.biz</td>
-                                    </tr>
+
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -127,57 +138,70 @@ function AccountSetting() {
                 </div>
                 <div>
                     <div class="main" id="Subscription">
-                        <h2>All Subscription</h2>
-                        {subscriptionList.map((item) => {
-                            return (
-                                <div class="card">
-                                    <div class="card-body">
-                                        <i class="fa fa-pen fa-xs edit"></i>
-                                        <table>
-                                            <tbody>
+                        <h2>All Subscriptions</h2>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Subscription ID</th>
+                                    <th scope="col">Status </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {subscriptionList && subscriptionList.map((item) => {
+                                    return (
                                                 <tr>
-                                                    <td>Subscription ID:</td>
-                                                    <td>:</td>
+                                                    <td>{localStorage.getItem('email')}</td>
                                                     <td>{item.id}</td>
-                                                </tr>
-                                                {/* <tr>
-                                <td>Start Data</td>
-                                <td>:</td>
-                                <td>
-                                   
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>End Data</td>
-                                <td>:</td>
-                                <td>
-                                
-                                </td>
-                            </tr> */}
-                                                <tr>
-                                                    <td>Email: </td>
-                                                    <td>:</td>
-                                                    <td>naveen191@vibhuti.biz</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Status: </td>
-                                                    <td>:</td>
                                                     <td><span style={{ color: "green" }}>{item.status}</span></td>
                                                 </tr>
-                                                <tr>
-                                                    {(item.status == "active") ? <td><button class="btn " onClick={() => cancelSubscription()}>Cancel</button></td> : null}
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )
-                        })}
+
+                                    )
+                                })}
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>
 
+            </div> : <div>
+                
+            <form action="" method="post" id="login" autocomplete="off" class="bg-light border p-3">
+        <div class="form-row">
+      
+          <div class="col-12">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"><i class="fas fa-user"></i></span>
+              </div>
+              <input name="username" type="text" value="" class="input form-control" id="username" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" />
             </div>
+          </div>
+          <div class="col-12">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"><i class="fas fa-lock"></i></span>
+              </div>
+              <input name="password" type="password" value="" class="input form-control" id="password" placeholder="password" required="true" aria-label="password" aria-describedby="basic-addon1" />
+              
+            </div>
+          </div>
+       
+         
+          <div class="col-12">
+            <button class="btn btn-primary" type="submit" name="signin">save</button>
+          </div>
+        </div>
+      </form>
+                
+                
+                
+                
+                
+                
+                
+                </div>}
         </div>
     )
 }

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import SideBar from './SideBar';
 import LoadingSpinner from './LoadingSpinner';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useApiKey } from './context';
 
 function Playground() {
     const getSecretValue = localStorage.getItem('secretKey')
@@ -15,6 +16,8 @@ function Playground() {
     const [results, setResults] = useState("")
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
+
+    const api_key =  useApiKey()
 
     const generateChatApi = () => {
         setLoading(true)
@@ -29,7 +32,7 @@ function Playground() {
             "accept": "application/json",
             "Content-Type": "multipart/form-data",
             "secertkey": getSecretValue,
-            "openai": ApiEndPoint.OpenAIKey
+            "openai": api_key
 
         }
 

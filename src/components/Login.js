@@ -5,40 +5,59 @@ import { ApiEndPoint } from '../components/service/ApiEndPoint';
 import LoadingSpinner from './LoadingSpinner';
 import logo from '../assets/ge-logo.png'
 import Footer from '../Footer';
+import { useApiKey } from './context';
+import DotPrinter from './DotPrinter';
+
 
 function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate()
     const [email, setEmail] = useState("");
+    const[password,setPassword] = useState("")
+    const [error,setError] = useState("");
 
-    const loginUser = (event) => {
+    const {getApiKey} = useApiKey();
+
+
+    const loginUser = (e) => {
+        // e.preventDefault();
+        setError("")
         setLoading(true)
         var bodyFormData = new FormData();
         bodyFormData.append("email", email);
+        bodyFormData.append("password", password);
+
         const headers = {
             "accept": "application/json",
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
+             "userType" : "extension"
         }
 
-        API.post(ApiEndPoint.AutoLogin, bodyFormData, {
+        API.post(ApiEndPoint.Login, bodyFormData, {
             headers: headers
         }).then((response) => {
 
-            console.log('reeeeeeeeeee', response.data.data);
+            console.log('response login', response.data.data);
             let apiStatus = response.status;
 
             saveDatatolocal(response.data.data);
-            setLoading(false)
-            // checkSubscription(response.data.data)
+            getApiKey();
+         
+          
             if (apiStatus == 200) {
-                navigate('/connect')
-            }
+setTimeout(()=>{
+    // getApiKey();
+    navigate('/')
+},1000)
+
+
+}
         })
             .catch((error) => {
-                alert(error.response.data.message)
+                setError(error.response.data.message)
                 setLoading(false)
-                console.log('reeeeeeeeeee', error.response.data);
+                console.log('error in login', error.response.data);
             });
 
     }
@@ -49,37 +68,39 @@ function Login() {
         localStorage.setItem('email', data.email)
         localStorage.setItem('personal_key',data.personal_key)
         localStorage.setItem('subscription',data.subscription)
-        localStorage.setItem('user_id',data.id)
+        localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        //  window.location.reload()
+
 
         const getValue = localStorage.getItem('secretKey')
         console.log("getValue", getValue)
 
     }
 
-   
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            loginUser();
+        }
+    };
 
     return (
-        // <div class="container">
-        //     <h1>Connect</h1>
-        //     {loading ? <LoadingSpinner /> : null}
-        //     <label for="email"><b>Email</b></label>
-        //     <input type="email" onChange={(e) => { setEmail(e.target.value) }} placeholder="Enter Email" name="email" required />
-
-        //     <div class="clearfix">
-        //         <button type="submit" onClick={() => { loginUser() }} class="signin">Sign In</button>
-        //         <p>Don't have Account?<Link to="/register">Register</Link></p>
-        //     </div>
-        // </div>
         <section class="main-container">
+         <div className='container'>
         <div class="logo">
             <img src={logo} alt="AI Harness"/>
         </div>
+        {error && <p style={{color:"red"}} >{error}</p>}
         <div class="login-form">
           <form onSubmit={(e)=>{e.preventDefault()}}>
-            <input type="email" placeholder="Email Address" onChange={(e) => { setEmail(e.target.value) }}/>
-            <button onClick={() => { loginUser() }}>Connect</button>
+            <input type="email" placeholder="Email " onChange={(e) => { setEmail(e.target.value) }}  onKeyDown={handleKeyDown}/>
+            <input type="password" placeholder="Password" onChange={(e) => { setPassword(e.target.value) }}  onKeyDown={handleKeyDown}/>
+{loading?<DotPrinter/> :   <button type='submit' onClick={() => { loginUser() }}>Connect</button>}
+         
           </form>
+          <p className='sign-up-in'>Don't have account <Link to="/register">signup</Link> ?</p>
         </div>
+        </div>   
         <Footer/>
     </section>
 

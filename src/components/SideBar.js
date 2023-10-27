@@ -21,6 +21,10 @@ function SideBar() {
 
   }
   return (
+
+    <>
+
+
     <div class="sidebar">
           {console.log("in retun",routeName)}
 
@@ -38,9 +42,12 @@ function SideBar() {
 
       <Link className= {routeName=='/upgradeToPlus'?"active":null} to='/upgradeToPlus'>Upgade To Plus</Link>
       <Link className= {routeName=='/accountSetting'?"active":null} to='/accountSetting'>Account Settings</Link>
+  
+
 
       <Link to='/' onClick={() => { onLogout() }}>Logout</Link>
     </div>
+    </>
   )
 }
 

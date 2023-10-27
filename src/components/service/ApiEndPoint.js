@@ -33,6 +33,9 @@ export const ApiEndPoint = {
     submitPrompt:'/api/prompt-base',
     //
 
-    keySetting:'/api/setting'
+    keySetting:'/api/setting',
+    GetApiKey : "/api/get-setting",
+    ContentText:'/api/content-text',
+    ReadPdf:'/api/pdf-reader',
 
 }
