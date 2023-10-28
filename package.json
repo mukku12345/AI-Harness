@@ -2,7 +2,6 @@
   "name": "gpt3-chrome-walkthrough",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://loving-jemison.62-151-180-40.plesk.page/",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -57,10 +56,6 @@
   },
   "description": "chrome extension",
   "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "http://192.168.0.91/1Vibhuti/ai-harness-chrome.git"
-  },
   "author": "mukesh",
   "license": "ISC"
 }
